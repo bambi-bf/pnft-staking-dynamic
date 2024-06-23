@@ -25,9 +25,21 @@ pub mod staking {
         Initialize::process_instruction(&mut ctx)
     }
 
-    //  Admin can hand over admin role
-    pub fn change_reward_env(mut ctx: Context<ChangeRewardEnv>, new_admin: Option<Pubkey>, new_reward_mint: Option<Pubkey>, new_reward_enable: Option<bool>, new_reward_per_day: Option<i64>) -> Result<()> {
-        ChangeRewardEnv::process_instruction(&mut ctx, new_admin, new_reward_mint, new_reward_enable, new_reward_per_day)
+    //  Admin can config reward env
+    pub fn change_reward_env(
+        mut ctx: Context<ChangeRewardEnv>,
+        new_admin: Option<Pubkey>,
+        new_reward_mint: Option<Pubkey>,
+        new_reward_enable: Option<bool>,
+        new_reward_per_day: Option<i64>,
+    ) -> Result<()> {
+        ChangeRewardEnv::process_instruction(
+            &mut ctx,
+            new_admin,
+            new_reward_mint,
+            new_reward_enable,
+            new_reward_per_day,
+        )
     }
 
     //  Initialize user pool

@@ -7,7 +7,7 @@ pub struct GlobalPool {
     pub admin: Pubkey,
     pub reward_per_day: i64,
     pub reward_mint: Pubkey,
-    pub reward_enable: bool
+    pub reward_enable: bool,
 }
 
 impl Default for GlobalPool {
@@ -17,7 +17,7 @@ impl Default for GlobalPool {
             admin: Pubkey::default(),
             reward_per_day: 100_000_000,
             reward_mint: Pubkey::default(),
-            reward_enable: true
+            reward_enable: true,
         }
     }
 }
@@ -37,11 +37,11 @@ pub struct StakedNFT {
 #[account]
 pub struct UserPool {
     // 6456
-    pub owner: Pubkey,                           // 32
-    pub item_count: u64,                         // 8
-    pub items: Vec<StakedNFT>,                  
-    pub reward_time: i64,                        // 8
-    pub pending_reward: u64,                     // 8
+    pub owner: Pubkey,   // 32
+    pub item_count: u64, // 8
+    pub items: Vec<StakedNFT>,
+    pub reward_time: i64,    // 8
+    pub pending_reward: u64, // 8
 }
 impl Default for UserPool {
     #[inline]
@@ -57,7 +57,7 @@ impl Default for UserPool {
 }
 
 impl UserPool {
-    pub const DATA_SIZE: usize = 32 + 8  + 4 + 8 + 8;
+    pub const DATA_SIZE: usize = 32 + 8 + 4 + 8 + 8;
     pub fn add_nft(&mut self, item: StakedNFT) {
         // self.items[self.item_count as usize] = item;
         // self.item_count += 1;
@@ -80,7 +80,9 @@ impl UserPool {
                 //     last_reward_time = self.items[index].stake_time;
                 // }
 
-                reward = (self.items[index].rate as f64 * ((now as f64 - self.items[index].reward_time as f64) / DAY as f64) as f64) as u64;
+                reward = (self.items[index].rate as f64
+                    * ((now as f64 - self.items[index].reward_time as f64) / DAY as f64) as f64)
+                    as u64;
 
                 // remove nft
                 if i != self.item_count - 1 {
@@ -105,8 +107,9 @@ impl UserPool {
                 // if last_reward_time < self.items[index].stake_time {
                 //     last_reward_time = self.items[index].stake_time;
                 // }
-                reward = (self.items[index].rate * (now - self.items[index].reward_time) / DAY) as u64;
-                
+                reward =
+                    (self.items[index].rate * (now - self.items[index].reward_time) / DAY) as u64;
+
                 self.items[index].reward_time = now;
             }
         }
@@ -122,7 +125,9 @@ impl UserPool {
             //     last_reward_time = self.items[index].reward_time;
             // }
             let mut _reward: u64 = 0;
-            _reward = (self.items[index].rate as f64 * ((now as f64 - self.items[index].reward_time as f64) / DAY as f64) as f64) as u64;
+            _reward = (self.items[index].rate as f64
+                * ((now as f64 - self.items[index].reward_time as f64) / DAY as f64) as f64)
+                as u64;
             total_reward += _reward;
             self.items[index].reward_time = now;
         }

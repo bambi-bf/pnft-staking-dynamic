@@ -1,7 +1,6 @@
 use {
     crate::*,
-    
-    anchor_spl::token::{self, Token, TokenAccount, Transfer}
+    anchor_spl::token::{self, Token, TokenAccount, Transfer},
 };
 
 #[derive(Accounts)]
@@ -48,7 +47,10 @@ pub fn claim_reward_handler(ctx: Context<ClaimReward>) -> Result<()> {
     if ctx.accounts.reward_vault.amount < 1000_000_000 + reward {
         return Err(StakingError::LackLamports.into());
     }
-    let seeds = &[GLOBAL_AUTHORITY_SEED.as_bytes(), &[ctx.bumps.global_authority]];
+    let seeds = &[
+        GLOBAL_AUTHORITY_SEED.as_bytes(),
+        &[ctx.bumps.global_authority],
+    ];
     let signer = &[&seeds[..]];
     let token_program = ctx.accounts.token_program.to_account_info();
     let cpi_accounts = Transfer {
@@ -62,5 +64,4 @@ pub fn claim_reward_handler(ctx: Context<ClaimReward>) -> Result<()> {
     )?;
 
     Ok(())
-
 }

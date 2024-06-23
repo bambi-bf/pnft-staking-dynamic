@@ -19,7 +19,13 @@ pub struct ChangeRewardEnv<'info> {
 }
 
 impl ChangeRewardEnv<'_> {
-    pub fn process_instruction(ctx: &mut Context<Self>, new_admin: Option<Pubkey>, new_reward_mint: Option<Pubkey>, new_reward_enable: Option<bool>, new_reward_per_day: Option<i64>) -> Result<()> {
+    pub fn process_instruction(
+        ctx: &mut Context<Self>,
+        new_admin: Option<Pubkey>,
+        new_reward_mint: Option<Pubkey>,
+        new_reward_enable: Option<bool>,
+        new_reward_per_day: Option<i64>,
+    ) -> Result<()> {
         let global_pool = &mut ctx.accounts.global_pool;
 
         // Don't need check admin since it signed the transaction

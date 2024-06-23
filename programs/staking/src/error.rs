@@ -25,5 +25,5 @@ pub enum StakingError {
     #[msg("No Matching NFT to withdraw")]
     InvalidNFTAddress,
     #[msg("Reward is disabled")]
-    DisabledReward
+    DisabledReward,
 }
