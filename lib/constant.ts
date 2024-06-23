@@ -1,7 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 
 export const GLOBAL_AUTHORITY_SEED = "global-authority-veer";
-export const USER_POOL_SEED = "user-pool";
+export const USER_POOL_SEED = "user-pool-veer";
 
 export const USER_POOL_SIZE = 4160;
 

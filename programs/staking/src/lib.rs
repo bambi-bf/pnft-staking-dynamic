@@ -4,10 +4,12 @@ pub mod constant;
 pub mod error;
 pub mod instructions;
 pub mod state;
+pub mod util;
 use constant::*;
 use error::*;
 use instructions::*;
 use state::*;
+use util::*;
 
 declare_id!("3zvTUf8MUCdMEztg6JY66Ypf4W8Uk9Z9PjRkfiT3SpFN");
 

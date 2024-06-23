@@ -2,7 +2,7 @@ import { Program, Wallet, web3 } from "@coral-xyz/anchor";
 import * as anchor from "@coral-xyz/anchor";
 import fs from "fs";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import { GLOBAL_AUTHORITY_SEED, PROGRAM_ID } from "../lib/constant";
+import { GLOBAL_AUTHORITY_SEED, PROGRAM_ID, USER_POOL_SEED } from "../lib/constant";
 import {
   ComputeBudgetProgram,
   Connection,
@@ -246,7 +246,7 @@ export const getUserState = async (
 ): Promise<UserPool | null> => {
   let userPoolKey = await PublicKey.createWithSeed(
     user,
-    "user-pool",
+    USER_POOL_SEED,
     program.programId
   );
   console.log("userPoolKey: ", userPoolKey.toBase58());

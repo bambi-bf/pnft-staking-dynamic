@@ -7,7 +7,7 @@ pub struct Initialize<'info> {
 
     //  Global pool stores admin address
     #[account(
-        init,
+        init_if_needed,
         space = 8 + GlobalPool::DATA_SIZE,
         seeds = [GLOBAL_AUTHORITY_SEED.as_ref()],
         bump,

@@ -39,8 +39,12 @@ pub struct LockPNFT<'info> {
     pub signer: Signer<'info>,
 
     //  PDA that stores user's stake info
-    #[account(mut)]
-    pub user_pool: AccountLoader<'info, UserPool>,
+    #[account(
+        mut,
+        seeds = [USER_POOL_SEED.as_ref()],
+        bump
+    )]
+    pub user_pool: Account<'info, UserPool>,
 
     token_program: Program<'info, Token>,
     /// CHECK intstruction will fail if wrong program is supplied
@@ -256,7 +260,15 @@ pub fn lock_pnft_handler(ctx: Context<LockPNFT>, lock_period: i64) -> Result<()>
         lock_time,
         rate: _rate,
     };
-    let mut user_pool = ctx.accounts.user_pool.load_mut()?;
+    let user_pool = &mut ctx.accounts.user_pool;
+    if user_pool.items.len() == user_pool.items.capacity() {
+        resize_account(
+            user_pool.to_account_info().clone(),
+            user_pool.items.capacity() + 1,
+            ctx.accounts.signer.to_account_info().clone(),
+            ctx.accounts.system_program.to_account_info().clone()
+        )?;
+    }
 
     user_pool.add_nft(staked_item);
 

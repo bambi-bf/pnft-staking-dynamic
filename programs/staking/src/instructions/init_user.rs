@@ -6,8 +6,8 @@ pub struct InitUser<'info> {
     pub user: Signer<'info>,
 
     //  User pool stores user's stake info
-    #[account(zero)]
-    pub user_pool: AccountLoader<'info, UserPool>,
+    #[account(mut)]
+    pub user_pool: Account<'info, UserPool>,
 
     //  Needed to init new account
     pub system_program: Program<'info, System>,
@@ -16,7 +16,7 @@ pub struct InitUser<'info> {
 
 impl InitUser<'_> {
     pub fn process_instruction(ctx: &mut Context<Self>) -> Result<()> {
-        let mut user = ctx.accounts.user_pool.load_init()?;
+        let user = &mut ctx.accounts.user_pool;
 
         user.owner = ctx.accounts.user.key();
         Ok(())

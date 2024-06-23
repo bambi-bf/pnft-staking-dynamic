@@ -163,7 +163,7 @@ export const createInitUserTx = async (
 ) => {
   let userPoolKey = await PublicKey.createWithSeed(
     userAddress,
-    "user-pool",
+    USER_POOL_SEED,
     program.programId
   );
 
@@ -172,7 +172,7 @@ export const createInitUserTx = async (
   let ix = SystemProgram.createAccountWithSeed({
     fromPubkey: userAddress,
     basePubkey: userAddress,
-    seed: "user-pool",
+    seed: USER_POOL_SEED,
     newAccountPubkey: userPoolKey,
     lamports: await solConnection.getMinimumBalanceForRentExemption(
       USER_POOL_SIZE
@@ -211,7 +211,7 @@ export const createLockPnftTx = async (
 
   let userPoolKey = await PublicKey.createWithSeed(
     userAddress,
-    "user-pool",
+    USER_POOL_SEED,
     program.programId
   );
   console.log("userPool: ", userPoolKey.toBase58());
@@ -287,7 +287,7 @@ export const claimRewardTx = async (
 
   let userPoolKey = await PublicKey.createWithSeed(
     userAddress,
-    "user-pool",
+    USER_POOL_SEED,
     program.programId
   );
 
@@ -337,7 +337,7 @@ export const createUnlockPnftTx = async (
 
   let userPoolKey = await PublicKey.createWithSeed(
     userAddress,
-    "user-pool",
+    USER_POOL_SEED,
     program.programId
   );
   console.log("userPool: ", userPoolKey.toBase58());

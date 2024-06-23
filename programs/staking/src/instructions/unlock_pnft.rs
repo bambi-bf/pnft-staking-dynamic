@@ -36,7 +36,7 @@ pub struct UnlockPNFT<'info> {
 
     //  PDA that stores user's stake info
     #[account(mut)]
-    pub user_pool: AccountLoader<'info, UserPool>,
+    pub user_pool: Account<'info, UserPool>,
 
     pub token_program: Program<'info, Token>,
     /// CHECK intstruction will fail if wrong program is supplied
@@ -49,7 +49,7 @@ pub struct UnlockPNFT<'info> {
 
 pub fn unlock_pnft_handler(ctx: Context<UnlockPNFT>) -> Result<()> {
 
-    let mut user_pool = ctx.accounts.user_pool.load_mut()?;
+    let user_pool = &mut ctx.accounts.user_pool;
 
     let seeds = &[
         GLOBAL_AUTHORITY_SEED.as_bytes(), 

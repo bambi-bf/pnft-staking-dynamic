@@ -10,7 +10,7 @@ pub struct ClaimReward<'info> {
     pub owner: Signer<'info>,
 
     #[account(mut)]
-    pub user_pool: AccountLoader<'info, UserPool>,
+    pub user_pool: Account<'info, UserPool>,
 
     #[account(
         mut,
@@ -39,7 +39,7 @@ pub struct ClaimReward<'info> {
 pub fn claim_reward_handler(ctx: Context<ClaimReward>) -> Result<()> {
     let global_pool = &mut ctx.accounts.global_authority;
     let timestamp = Clock::get()?.unix_timestamp;
-    let mut user_pool = ctx.accounts.user_pool.load_mut()?;
+    let user_pool = &mut ctx.accounts.user_pool;
     if global_pool.reward_enable == false {
         return Err(StakingError::DisabledReward.into());
     }

@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 
 use crate::constant::*;
 use crate::error::*;
-
 #[account]
 pub struct GlobalPool {
     pub admin: Pubkey,
@@ -27,8 +26,7 @@ impl GlobalPool {
     pub const DATA_SIZE: usize = 32 + 64 / 8 + 32 + 1;
 }
 
-#[zero_copy]
-#[derive(Default)]
+#[derive(AnchorSerialize, AnchorDeserialize, Default, Clone)]
 pub struct StakedNFT {
     pub nft_addr: Pubkey,
     pub stake_time: i64,
@@ -36,14 +34,12 @@ pub struct StakedNFT {
     pub lock_time: i64,
     pub rate: i64,
 }
-
-// #[account(zero_copy)]
-#[derive(Default)]
+#[account]
 pub struct UserPool {
     // 6456
     pub owner: Pubkey,                           // 32
     pub item_count: u64,                         // 8
-    pub items: Vec<StakedNFT>,                  // 64 * 100 = 6400
+    pub items: Vec<StakedNFT>,                  
     pub reward_time: i64,                        // 8
     pub pending_reward: u64,                     // 8
 }
@@ -53,9 +49,7 @@ impl Default for UserPool {
         UserPool {
             owner: Pubkey::default(),
             item_count: 0,
-            items: [StakedNFT {
-                ..Default::default()
-            }; 64],
+            items: Vec::with_capacity(5),
             reward_time: 0,
             pending_reward: 0,
         }
@@ -63,8 +57,11 @@ impl Default for UserPool {
 }
 
 impl UserPool {
+    pub const DATA_SIZE: usize = 32 + 8  + 4 + 8 + 8;
     pub fn add_nft(&mut self, item: StakedNFT) {
-        self.items[self.item_count as usize] = item;
+        // self.items[self.item_count as usize] = item;
+        // self.item_count += 1;
+        self.items.push(item);
         self.item_count += 1;
     }
     pub fn remove_nft(&mut self, owner: Pubkey, nft_mint: Pubkey, now: i64) -> Result<u64> {
@@ -83,12 +80,12 @@ impl UserPool {
                 //     last_reward_time = self.items[index].stake_time;
                 // }
 
-                reward = (self.items[index].rate * (now - self.items[index].reward_time) / DAY) as u64;
+                reward = (self.items[index].rate as f64 * ((now as f64 - self.items[index].reward_time as f64) / DAY as f64) as f64) as u64;
 
                 // remove nft
                 if i != self.item_count - 1 {
                     let last_idx = self.item_count - 1;
-                    self.items[index] = self.items[last_idx as usize];
+                    self.items[index] = self.items[last_idx as usize].clone();
                 }
                 self.item_count -= 1;
                 withdrawn = 1;
