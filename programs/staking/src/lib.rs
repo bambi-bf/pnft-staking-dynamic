@@ -11,7 +11,7 @@ use instructions::*;
 use state::*;
 use util::*;
 
-declare_id!("3zvTUf8MUCdMEztg6JY66Ypf4W8Uk9Z9PjRkfiT3SpFN");
+declare_id!("BXxRvgXLLh3Vfah9Ed9AnPGXo64GGqyit6jDku5sPrds");
 
 #[program]
 pub mod staking {
@@ -31,7 +31,7 @@ pub mod staking {
         new_admin: Option<Pubkey>,
         new_reward_mint: Option<Pubkey>,
         new_reward_enable: Option<bool>,
-        new_reward_per_day: Option<i64>,
+        new_reward_per_day: Option<u64>,
     ) -> Result<()> {
         ChangeRewardEnv::process_instruction(
             &mut ctx,
@@ -50,8 +50,8 @@ pub mod staking {
     /**
      * User can lock pNFTs from specific collection
      */
-    pub fn lock_pnft(ctx: Context<LockPNFT>, lock_period: i64) -> Result<()> {
-        lock_pnft::lock_pnft_handler(ctx, lock_period)
+    pub fn lock_pnft(ctx: Context<LockPNFT>) -> Result<()> {
+        lock_pnft::lock_pnft_handler(ctx)
     }
 
     /**

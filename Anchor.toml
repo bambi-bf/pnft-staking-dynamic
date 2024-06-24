@@ -5,13 +5,13 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-staking = "3zvTUf8MUCdMEztg6JY66Ypf4W8Uk9Z9PjRkfiT3SpFN"
+staking = "BXxRvgXLLh3Vfah9Ed9AnPGXo64GGqyit6jDku5sPrds"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "Devnet"
 wallet = "/home/ubuntu/apollo/pl-staking/staking-veer/key.json"
 
 [scripts]

@@ -2,18 +2,14 @@ use crate::*;
 
 #[derive(Accounts)]
 pub struct ChangeRewardEnv<'info> {
-    // Current admin
-    #[account(
-        mut,
-        constraint = global_pool.admin == *admin.key @StakingError::InvalidAdmin
-    )]
+    #[account(mut)]
     pub admin: Signer<'info>,
 
-    //  Global pool stores admin address
     #[account(
         mut,
         seeds = [GLOBAL_AUTHORITY_SEED.as_ref()],
-        bump
+        bump,
+        has_one = admin @ StakingError::InvalidAdmin,
     )]
     pub global_pool: Account<'info, GlobalPool>,
 }
@@ -24,7 +20,7 @@ impl ChangeRewardEnv<'_> {
         new_admin: Option<Pubkey>,
         new_reward_mint: Option<Pubkey>,
         new_reward_enable: Option<bool>,
-        new_reward_per_day: Option<i64>,
+        new_reward_per_day: Option<u64>,
     ) -> Result<()> {
         let global_pool = &mut ctx.accounts.global_pool;
 

@@ -8,6 +8,7 @@ import {
   claimReward,
   getGlobalInfo,
   initProject,
+  initializeUserPool,
   lockPnft,
   setClusterConfig,
   unlockPnft,
@@ -103,7 +104,7 @@ programCommand("change-reward-enable")
   });
 
 programCommand("change-mint")
-  .option("-nm, --new_mint <string>", "new reward per day")
+  .option("-nm, --new_mint <string>", "new reward mint")
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   .action(async (directory, cmd) => {
     const { env, keypair, rpc, new_mint } = cmd.opts();
@@ -186,6 +187,20 @@ programCommand("global-pool")
     await setClusterConfig(env, keypair, rpc);
 
     await getGlobalInfo();
+  });
+
+  programCommand("init-user")
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  .action(async (directory, cmd) => {
+    const { env, keypair, rpc } = cmd.opts();
+
+    console.log("Solana Cluster:", env);
+    console.log("Keypair Path:", keypair);
+    console.log("RPC URL:", rpc);
+
+    await setClusterConfig(env, keypair, rpc);
+
+    await initializeUserPool();
   });
 
 function programCommand(name: string) {

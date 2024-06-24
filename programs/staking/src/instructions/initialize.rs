@@ -5,17 +5,15 @@ pub struct Initialize<'info> {
     #[account(mut)]
     pub admin: Signer<'info>,
 
-    //  Global pool stores admin address
     #[account(
-        init_if_needed,
-        space = 8 + GlobalPool::DATA_SIZE,
+        init,
+        space = GlobalPool::DATA_SIZE,
         seeds = [GLOBAL_AUTHORITY_SEED.as_ref()],
         bump,
         payer = admin
     )]
     pub global_pool: Account<'info, GlobalPool>,
 
-    //  Needed to init new account
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }

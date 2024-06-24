@@ -14,7 +14,7 @@ import {
 import { IDL } from "../target/types/staking";
 import {
   changeAdminTx,
-  changeMintTx,
+  changeRewardMintTx,
   changeRewardEnableTx,
   changeRewardPerDayTx,
   claimRewardTx,
@@ -23,6 +23,7 @@ import {
   createLockPnftTx,
   createUnlockPnftTx,
   getGlobalState,
+  getRewardVaultTx,
 } from "../lib/scripts";
 import { GlobalPool, UserPool } from "../lib/types";
 import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
@@ -148,10 +149,9 @@ export const changeRewardPerDay = async (newRewardPerDay: number) => {
 };
 
 export const changeRewardEnable = async (newRewardEnable: number) => {
-  console.log(newRewardEnable);
   const tx = await changeRewardEnableTx(
     payer.publicKey,
-    newRewardEnable,
+    newRewardEnable == 1 ? true : false,
     program
   );
 
@@ -172,7 +172,7 @@ export const changeMint = async (newMint: string) => {
       { skipValidation: true }
     ).publicKey;
   }
-  const tx = await changeMintTx(payer.publicKey, newMintAddr, program);
+  const tx = await changeRewardMintTx(payer.publicKey, newMintAddr, program);
 
   const txId = await provider.sendAndConfirm(tx, [], {
     commitment: "confirmed",
@@ -186,7 +186,7 @@ export const changeMint = async (newMint: string) => {
  */
 export const initializeUserPool = async () => {
   try {
-    const tx = await createInitUserTx(payer.publicKey, solConnection, program);
+    const tx = await createInitUserTx(payer.publicKey, program);
 
     const txId = await provider.sendAndConfirm(tx, [], {
       commitment: "confirmed",
@@ -260,8 +260,16 @@ export const getUserState = async (
 };
 
 export const getGlobalInfo = async () => {
-  await getGlobalState(program);
+  console.log("global pool: ", await getGlobalState(program));
 };
+
+export const getRewardVault = async () => {
+  console.log("Reward vault: ", getRewardVaultTx(program));
+}
+
+export const createInitUser = async () => {
+  
+}
 
 export const addAdminSignAndConfirm = async (txData: Buffer) => {
   // Deserialize the transaction
