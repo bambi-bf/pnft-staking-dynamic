@@ -2,7 +2,7 @@ import { program } from "commander";
 import { PublicKey } from "@solana/web3.js";
 import {
   changeAdmin,
-  changeMint,
+  changeRewardMint,
   changeRewardEnable,
   changeRewardPerDay,
   claimReward,
@@ -12,6 +12,7 @@ import {
   lockPnft,
   setClusterConfig,
   unlockPnft,
+  getUserInfo,
 } from "./scripts";
 
 // program.version('0.0.1');
@@ -44,7 +45,7 @@ programCommand("init")
   });
 
 programCommand("change-admin")
-  .option("-n, --new_admin <string>", "new admin address")
+  .option("-a, --new_admin <string>", "new admin address")
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   .action(async (directory, cmd) => {
     const { env, keypair, rpc, new_admin } = cmd.opts();
@@ -64,7 +65,7 @@ programCommand("change-admin")
   });
 
 programCommand("change-reward-per-day")
-  .option("-nd, --new_reward_per_day <number>", "new reward per day")
+  .option("-n, --new_reward_per_day <number>", "new reward per day")
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   .action(async (directory, cmd) => {
     const { env, keypair, rpc, new_reward_per_day } = cmd.opts();
@@ -84,7 +85,7 @@ programCommand("change-reward-per-day")
   });
 
 programCommand("change-reward-enable")
-  .option("-ne, --new_reward_enable <number>", "new reward enable")
+  .option("-n, --new_reward_enable <number>", "new reward enable")
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   .action(async (directory, cmd) => {
     const { env, keypair, rpc, new_reward_enable } = cmd.opts();
@@ -103,8 +104,8 @@ programCommand("change-reward-enable")
     await changeRewardEnable(new_reward_enable);
   });
 
-programCommand("change-mint")
-  .option("-nm, --new_mint <string>", "new reward mint")
+programCommand("change-reward-mint")
+  .option("-m, --new_mint <string>", "new reward mint")
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   .action(async (directory, cmd) => {
     const { env, keypair, rpc, new_mint } = cmd.opts();
@@ -120,7 +121,7 @@ programCommand("change-mint")
     }
 
     //  update global info
-    await changeMint(new_mint);
+    await changeRewardMint(new_mint);
   });
 
 programCommand("lock")
@@ -175,10 +176,11 @@ programCommand("claim-reward")
     await claimReward();
   });
 
-programCommand("global-pool")
+programCommand("user-status")
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  .option("-a, --user_address <string>")
   .action(async (directory, cmd) => {
-    const { env, keypair, rpc } = cmd.opts();
+    const { env, keypair, rpc, user_address } = cmd.opts();
 
     console.log("Solana Cluster:", env);
     console.log("Keypair Path:", keypair);
@@ -186,7 +188,7 @@ programCommand("global-pool")
 
     await setClusterConfig(env, keypair, rpc);
 
-    await getGlobalInfo();
+    await getUserInfo(new PublicKey(user_address));
   });
 
   programCommand("init-user")

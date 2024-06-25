@@ -2,7 +2,7 @@ import { Program, Wallet, web3 } from "@coral-xyz/anchor";
 import * as anchor from "@coral-xyz/anchor";
 import fs from "fs";
 import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
-import { GLOBAL_AUTHORITY_SEED, PROGRAM_ID, USER_POOL_SEED } from "../lib/constant";
+import { PROGRAM_ID } from "../lib/constant";
 import {
   ComputeBudgetProgram,
   Connection,
@@ -23,10 +23,9 @@ import {
   createLockPnftTx,
   createUnlockPnftTx,
   getGlobalState,
-  getRewardVaultTx,
+  getUserState,
+  getRewardVault,
 } from "../lib/scripts";
-import { GlobalPool, UserPool } from "../lib/types";
-import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 
 let solConnection: Connection = null;
 let program: Program = null;
@@ -162,7 +161,7 @@ export const changeRewardEnable = async (newRewardEnable: number) => {
   console.log("txHash: ", txId);
 };
 
-export const changeMint = async (newMint: string) => {
+export const changeRewardMint = async (newMint: string) => {
   let newMintAddr = null;
   try {
     newMintAddr = new PublicKey(newMint);
@@ -241,34 +240,21 @@ export const claimReward = async () => {
   }
 };
 
-export const getUserState = async (
+export const getUserInfo = async (
   user: PublicKey
-): Promise<UserPool | null> => {
-  let userPoolKey = await PublicKey.createWithSeed(
-    user,
-    USER_POOL_SEED,
-    program.programId
-  );
-  console.log("userPoolKey: ", userPoolKey.toBase58());
-
-  try {
-    let userState = await program.account.userPool.fetch(userPoolKey);
-    return userState as unknown as UserPool;
-  } catch {
-    return null;
-  }
+) => {
+  const { data, key } = await getUserState(user, program);
+  console.log("userPoolKey: ", key.toBase58());
+  console.log(data);
 };
 
 export const getGlobalInfo = async () => {
-  console.log("global pool: ", await getGlobalState(program));
-};
-
-export const getRewardVault = async () => {
-  console.log("Reward vault: ", getRewardVaultTx(program));
-}
-
-export const createInitUser = async () => {
-  
+  const { data, key } = await getGlobalState(program);
+  console.log("global pool: ", key.toBase58());
+  console.log(data);
+  const { balance, key: vaultKey } = await getRewardVault(program);
+  console.log("Reward vault: ", vaultKey.toBase58());
+  console.log(balance);
 }
 
 export const addAdminSignAndConfirm = async (txData: Buffer) => {

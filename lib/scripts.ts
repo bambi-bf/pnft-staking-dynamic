@@ -153,19 +153,10 @@ export const createInitUserTx = async (
   userAddress: PublicKey,
   program: anchor.Program
 ) => {
-  // let userPoolKey = await PublicKey.createWithSeed(
-  //   userAddress,
-  //   USER_POOL_SEED,
-  //   program.programId
-  // );
-
   const [userPool] = PublicKey.findProgramAddressSync([
     Buffer.from(USER_POOL_SEED),
     userAddress.toBytes(),
   ], program.programId);
-
-  // TODO: remove debug log
-  console.log(`userPool: ${userPool.toString()}`);
 
   const tx = await program.methods
     .initUser()
@@ -192,43 +183,30 @@ export const createLockPnftTx = async (
     [Buffer.from(GLOBAL_AUTHORITY_SEED)],
     program.programId
   );
-  console.log("globalPool: ", globalPool.toBase58());
 
-  // let userPoolKey = await PublicKey.createWithSeed(
-  //   userAddress,
-  //   USER_POOL_SEED,
-  //   program.programId
-  // );
   const [userPool] = PublicKey.findProgramAddressSync([
     Buffer.from(USER_POOL_SEED),
     userAddress.toBytes(),
   ], program.programId);
-  console.log("userPool: ", userPool.toBase58());
 
   const nftEdition = await getMasterEdition(nftMint);
-  console.log("nftEdition: ", nftEdition.toBase58());
 
   let tokenAccount = await getAssociatedTokenAccount(userAddress, nftMint);
-  console.log("tokenAccount: ", tokenAccount.toBase58());
 
   const mintMetadata = await getMetadata(nftMint);
-  console.log("mintMetadata: ", mintMetadata.toBase58());
 
   const tokenMintRecord = findTokenRecordPda(nftMint, tokenAccount);
-  console.log("tokenMintRecord: ", tokenMintRecord.toBase58());
 
   const tx = new Transaction();
 
   let poolAccount = await connection.getAccountInfo(userPool);
   if (poolAccount === null || poolAccount.data === null) {
-    console.log("init User Pool");
     const tx_initUserPool = await createInitUserTx(
       userAddress,
       program
     );
     tx.add(tx_initUserPool);
   }
-  console.log("=======");
   const txId = await program.methods
     .lockPnft()
     .accounts({
@@ -256,8 +234,6 @@ export const createLockPnftTx = async (
 
   const txData = await wallet.signTransaction(tx);
 
-  console.log("signed user: ", userAddress.toBase58());
-
   return txData.serialize({ requireAllSignatures: false });
 };
 
@@ -271,19 +247,10 @@ export const claimRewardTx = async (
     program.programId
   );
 
-  console.log("globalPool =", globalPool.toBase58());
-
-  // let userPoolKey = await PublicKey.createWithSeed(
-  //   userAddress,
-  //   USER_POOL_SEED,
-  //   program.programId
-  // );
   const [userPool] = PublicKey.findProgramAddressSync([
     Buffer.from(USER_POOL_SEED),
     userAddress.toBytes(),
   ], program.programId);
-
-  console.log("user pool: ", await program.account.userPool.fetch(userPool));
 
   let { instructions, destinationAccounts } = await getATokenAccountsNeedCreate(
     connection,
@@ -296,8 +263,6 @@ export const claimRewardTx = async (
     globalPool,
     REWARD_TOKEN_MINT
   );
-
-  console.log("reward vault: ", rewardVault);
 
   const txId = await program.methods
     .claimReward()
@@ -330,30 +295,19 @@ export const createUnlockPnftTx = async (
     [Buffer.from(GLOBAL_AUTHORITY_SEED)],
     program.programId
   );
-  console.log("globalPool: ", globalPool.toBase58());
 
-  // let userPoolKey = await PublicKey.createWithSeed(
-  //   userAddress,
-  //   USER_POOL_SEED,
-  //   program.programId
-  // );
   const [userPool] = PublicKey.findProgramAddressSync([
     Buffer.from(USER_POOL_SEED),
     userAddress.toBytes(),
   ], program.programId);
-  console.log("userPool: ", userPool.toBase58());
 
   const nftEdition = await getMasterEdition(nftMint);
-  console.log("nftEdition: ", nftEdition.toBase58());
 
   let tokenAccount = await getAssociatedTokenAccount(userAddress, nftMint);
-  console.log("tokenAccount: ", tokenAccount.toBase58());
 
   const mintMetadata = await getMetadata(nftMint);
-  console.log("mintMetadata: ", mintMetadata.toBase58());
 
   const tokenMintRecord = findTokenRecordPda(nftMint, tokenAccount);
-  console.log("tokenMintRecord: ", tokenMintRecord.toBase58());
 
   const tx = new Transaction();
 
@@ -385,8 +339,6 @@ export const createUnlockPnftTx = async (
 
   const txData = await wallet.signTransaction(tx);
 
-  console.log("signed user: ", userAddress.toBase58());
-
   return txData.serialize({ requireAllSignatures: false });
 };
 
@@ -398,7 +350,13 @@ export const getGlobalState = async (program: anchor.Program) => {
     [Buffer.from(GLOBAL_AUTHORITY_SEED)],
     program.programId
   );
-  let globalPoolData = await program.account.globalPool.fetch(globalPool);
+  let globalPoolData;
+  try {
+    globalPoolData = await program.account.globalPool.fetch(globalPool);
+  } catch (e) {
+    console.error(e);
+    globalPoolData = null;
+  }
 
   return {
     key: globalPool,
@@ -407,9 +365,31 @@ export const getGlobalState = async (program: anchor.Program) => {
 };
 
 /**
+ * Fetch user pool PDA data
+ */
+export const getUserState = async (user: PublicKey, program: anchor.Program) => {
+  const [userPool] = PublicKey.findProgramAddressSync([
+    Buffer.from(USER_POOL_SEED),
+    user.toBytes(),
+  ], program.programId);
+  let userPoolData;
+  try {
+    userPoolData = await program.account.userPool.fetch(userPool);
+  } catch (e) {
+    console.error(e);
+    userPoolData = null;
+  }
+
+  return {
+    key: userPool,
+    data: userPoolData,
+  }
+};
+
+/**
  * Fetch global reward vault account balance
  */
-export const getRewardVaultTx = async (program: anchor.Program) => {
+export const getRewardVault = async (program: anchor.Program) => {
   const [globalPool] = PublicKey.findProgramAddressSync(
     [Buffer.from(GLOBAL_AUTHORITY_SEED)],
     program.programId
